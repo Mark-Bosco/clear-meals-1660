@@ -58,4 +58,4 @@ The app uses the FatSecret API for food data. Key endpoints include:
 
 For full API documentation, visit [FatSecret Platform API](https://platform.fatsecret.com/api/Default.aspx?screen=rapiref2).
 
-Made with ❤️ by Mark Bosco
+Made by Mark Bosco
