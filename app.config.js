@@ -5,6 +5,7 @@ module.exports = {
     name: "Clear Meals",
     slug: "clear-meals",
     version: "1.0.0",
+    newArchEnabled: true,
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "myapp",

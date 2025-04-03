@@ -1,8 +1,8 @@
 # Prerequisites
 - [Node.js (version 14 or later)](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 - npm or yarn
-- Expo CLI (install globally via `npm install -g expo-cli`)
-- Firebase CLI (if you plan to work on backend functions `install via npm install -g firebase-tools`)
+- [Expo CLI](https://docs.expo.dev/more/expo-cli/) (install globally via `npm add expo`)
+- [Firebase CLI](https://firebase.google.com/docs/cli/) (if you plan to work on backend functions `install via npm install -g firebase-tools`)
 
 # Initial Setup
 0. Navigate to where you want to store the project
