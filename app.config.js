@@ -12,7 +12,7 @@ module.exports = {
     splash: {
       image: "./assets/images/icon-nobg.png",
       resizeMode: "contain",
-      backgroundColor: "#439963"
+      backgroundColor: "#ffffff"
     },
     android: {
       adaptiveIcon: {
