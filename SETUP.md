@@ -24,6 +24,8 @@
     - *This is the Firebase configuration file specifically for Android applications*
 3. Create a `serviceAccountKey.json` file and paste in the contents
     - *This is a Firebase Admin SDK credential file used for server-side authentication*
+4. Create a `GoogleService-Info.plist` file and paste in the contents
+    - *This is the Firebase configuration file specifically for IOS applications*
 
 # Running the Project
 1. Start the Expo Development Server by entering the following command while in the project root:

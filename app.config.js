@@ -22,6 +22,11 @@ module.exports = {
       package: "com.bosco.mealtracker",
       googleServicesFile: "./google-services.json"
     },
+    ios: {
+      bundleIdentifier: "com.bosco.mealtracker",
+      googleServicesFile: "./GoogleService-Info.plist",
+      supportsTablet: false,
+    },
     plugins: [
       "expo-router",
     ],

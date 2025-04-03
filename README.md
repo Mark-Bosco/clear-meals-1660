@@ -34,6 +34,7 @@ Clear Meals is a robust, user-friendly mobile application designed to help users
 - **TypeScript**: For type-safe code and improved developer experience.
 
 ## 📲 How to Use (Currently Android Only)
+*For developers see `SETUP.md`*
 
 1. **Download**: Install the latest APK from [here](https://github.com/Mark-Bosco/Clear-Meals/releases/tag/v0.1.0-alpha) onto your Android device.
 2. **Sign Up/Sign In**: Create an account or sign in to an existing one.
@@ -48,6 +49,8 @@ Clear Meals is a robust, user-friendly mobile application designed to help users
 7. **Edit/Delete Foods**: Swipe left on a food item in your daily log to delete it. Click on an item to edit it.
 8. **Calendar View**: Access the calendar icon to view your meal history and edit any daily logs.
 9. **Settings**: Manage your account settings and log out.
+
+
 
 ## 📚 API Information
 
