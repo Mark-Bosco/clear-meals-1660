@@ -42,14 +42,15 @@
 1. Create an Expo account and join the 1660 organization
 2. Install the Expo EAS CLI using this terminal command: `npm install -g eas-cli`
 3. Login to your Expo account in the terminal: `eas login`
-4. Make sure all your changes are committed to git
-5. (This step may not be needed) Temporarily adjust the `.gitignore` as indicated by the comments
-6. Run the build command: `eas build --platform android --profile preview`
-7. Use the exisiting keystore if prompted
-8. Check the progress of the build [here](https://expo.dev/accounts/cs1660/projects/clear-meals-1660/builds)
-9. Alternatively, you may try to build using GitHub [here](https://expo.dev/accounts/cs1660/projects/clear-meals-1660/builds)
+4. Increment `version` in `app.config.js` (i.e. 1.0.0 --> 1.0.1)
+5. Make sure all your changes are committed to git
+6. (This step may not be needed) Temporarily adjust the `.gitignore` as indicated by the comments
+7. Run the build command: `eas build --platform android --profile preview`
+8. Use the exisiting keystore if prompted
+9. Check the progress of the build [here](https://expo.dev/accounts/cs1660/projects/clear-meals-1660/builds)
+10. Alternatively, you may try to build using GitHub [here](https://expo.dev/accounts/cs1660/projects/clear-meals-1660/builds)
     - I have not personally tried this
-10. Click `Build From Github`
+11. Click `Build From Github`
     - Base directory: '/'
     - Platform: 'Android'
     - Git ref: 'dev'or 'main'
