@@ -21,11 +21,11 @@ module.exports = {
         backgroundColor: "#ffffff"
       },
       package: "com.bosco.mealtracker",
-      googleServicesFile: "./google-services.json"
+      googleServicesFile: process.env.GOOGLE_SERVICES_JSON || "./google-services.json"
     },
     ios: {
       bundleIdentifier: "com.bosco.mealtracker",
-      googleServicesFile: "./GoogleService-Info.plist",
+      googleServicesFile: process.env.GOOGLE_SERVICES_PLIST || "./GoogleService-Info.plist",
       supportsTablet: false,
     },
     plugins: [
