@@ -37,3 +37,12 @@
     - `firebase login`
 2. Start the local emulators
     - `firebase emulators:start`
+
+# Making Builds
+1. Create an Expo account and join the 1660 organization
+2. Install the Expo EAS CLI: `npm install -g eas-cli`
+3. Login to your Expo account in the terminal: `eas login`
+4. Make sure all your changes are committed to git
+5. Run the build command: `eas build --platform android --profile preview`
+6. Follow the prompts to complete the build setup
+7. Check the progress of the build [here](https://expo.dev/accounts/cs1660/projects/clear-meals-1660/builds)
