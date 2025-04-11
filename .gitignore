@@ -9,11 +9,12 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-# Had to comment these out to make a successful build
+# TEMPORARILY comment out these 4 secret files out to build locally
 .env
 serviceAccountKey.json
 google-services.json
 GoogleService-Info.plist
+# Be sure to RECOMMENT after building, DO NOT COMMIT TO REPO
 
 # macOS
 .DS_Store

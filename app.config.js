@@ -3,8 +3,8 @@ require('dotenv').config();
 module.exports = {
   expo: {
     name: "Clear Meals",
-    slug: "clear-meals",
-    version: "1.0.0",
+    slug: "clear-meals-1660",
+    version: "1.0.1",
     newArchEnabled: true,
     orientation: "portrait",
     icon: "./assets/images/icon.png",
@@ -21,11 +21,11 @@ module.exports = {
         backgroundColor: "#ffffff"
       },
       package: "com.bosco.mealtracker",
-      googleServicesFile: "./google-services.json"
+      googleServicesFile: process.env.GOOGLE_SERVICES_JSON || "./google-services.json"
     },
     ios: {
       bundleIdentifier: "com.bosco.mealtracker",
-      googleServicesFile: "./GoogleService-Info.plist",
+      googleServicesFile: process.env.GOOGLE_SERVICES_PLIST || "./GoogleService-Info.plist",
       supportsTablet: false,
     },
     plugins: [
@@ -34,12 +34,13 @@ module.exports = {
     experiments: {
       typedRoutes: true
     },
+    owner: "cs1660",
     extra: {
       router: {
         origin: false
       },
       eas: {
-        projectId: "30dbfa73-4e23-457c-9bb6-b3b142212ab1"
+        projectId: "07b9d0da-a51b-4368-9d3d-3d35a9bb8444"
       },
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
