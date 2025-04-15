@@ -70,7 +70,7 @@ For full API documentation, visit [FatSecret Platform API](https://platform.fats
 
 ## 📐 Architecture Diagram
 <p align="center">
-  <img src="./assets/images/architecture.png" alt="Architecture Diagram" width="1339" height="572">
+  <img src="./assets/images/architecture.png" alt="Architecture Diagram" width="700" height="300">
 </p>
 
 --- 
