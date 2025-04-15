@@ -73,6 +73,9 @@ For full API documentation, visit [FatSecret Platform API](https://platform.fats
   <img src="./assets/images/architecture.png" alt="Architecture Diagram" width="700" height="300">
 </p>
 
+- Dotted Lines: External Communication
+- Solid Lines: Internal Communication
+
 --- 
 
 # **🧑‍💻 For Developers Only! 👩‍💻**
