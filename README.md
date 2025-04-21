@@ -118,6 +118,7 @@ For full API documentation, visit [FatSecret Platform API](https://platform.fats
 2. Use an emulator or the Expo Go app on your mobile device to preview the application
     - Both IOS and Android are supproted
     - There may be some visual bugs on IOS
+    - You may get native code errors if running in Expo Go as the native libraries are not available. Use a native development build to test Google sign in functionality. 
 
 --- 
 
@@ -126,6 +127,10 @@ For full API documentation, visit [FatSecret Platform API](https://platform.fats
     - `firebase login`
 2. Make your code changes in `/functions` and commit them to GitHub
 3. Deploy the new or updated functions with: `firebase deploy --only functions`
+
+## Google Authentication
+1. Using a Google Authentication method requires additional configuration of the app in Firebase console. Follow the instructions [in the authentication library docs](https://react-native-google-signin.github.io/docs/setting-up/get-config-file) to configure Firebase and Google Authentication for your platform and build method.
+2. Google Authentication only works with a native build locally or on EAS, not Expo Go, for Android, as it requires native libraries.
 
 --- 
 
