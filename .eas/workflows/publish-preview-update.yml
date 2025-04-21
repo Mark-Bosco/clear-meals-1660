@@ -11,21 +11,24 @@ jobs:
     params:
       platform: android 
       profile: preview 
-      
+
     steps:
       - run: |
           # Install GitHub CLI
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
           sudo apt update && sudo apt install gh -y
-          
-          # Authenticate with GitHub (set GITHUB_TOKEN in your environment variables)
-          echo "${GITHUB_TOKEN}" | gh auth login --with-token
-          
-          # Fetch the APK file (ensure EAS saves it to a predictable path)
-          APK_PATH=$(find $EAS_BUILD_ARTIFACTS -name "*.apk")
 
-          # Create a release
+          # Authenticate with GitHub
+          echo $GITHUB_TOKEN | gh auth login --with-token
+
+          # Check for APK file
+          APK_PATH=$(find $EAS_BUILD_ARTIFACTS -name "*.apk" -print || true)
+
+          if [ -z "$APK_PATH" ]; then
+              echo "Error: APK file not found in $EAS_BUILD_ARTIFACTS. Release creation aborted."
+              exit 1
+          fi
+
+          # Create GitHub release
           RELEASE_NAME="Preview Build: $(date +'%Y-%m-%d %H:%M:%S')"
           RELEASE_TAG="preview-$(date +'%Y%m%d%H%M')"
           gh release create $RELEASE_TAG $APK_PATH --title "$RELEASE_NAME" --notes "Automated preview build release."
