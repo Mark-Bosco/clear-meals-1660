@@ -1,12 +1,35 @@
-name: Publish preview update
+name: Publish preview update with APK release
 
 on:
   push:
-    branches: ['*']
+    branches: ['*'] 
 
 jobs:
-  publish_preview_update:
-    name: Publish preview update
-    type: update
+  create_preview_build:
+    name: Create preview build
+    type: build
     params:
-      branch: ${{ github.ref_name || 'test' }}
+      platform: android 
+      profile: preview 
+
+  publish_apk_to_github:
+    name: Publish APK to GitHub
+    needs: [create_preview_build] 
+    type: custom
+    steps:
+      - run: |
+          # Install GitHub CLI
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update && sudo apt install gh -y
+          
+          # Authenticate with GitHub (set GITHUB_TOKEN in your environment variables)
+          echo "${GITHUB_TOKEN}" | gh auth login --with-token
+          
+          # Fetch the APK file (ensure EAS saves it to a predictable path)
+          APK_PATH=$(find $EAS_BUILD_ARTIFACTS -name "*.apk")
+
+          # Create a release
+          RELEASE_NAME="Preview Build: $(date +'%Y-%m-%d %H:%M:%S')"
+          RELEASE_TAG="preview-$(date +'%Y%m%d%H%M')"
+          gh release create $RELEASE_TAG $APK_PATH --title "$RELEASE_NAME" --notes "Automated preview build release."
