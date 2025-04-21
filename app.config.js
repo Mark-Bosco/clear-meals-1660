@@ -27,6 +27,9 @@ module.exports = {
       bundleIdentifier: "com.bosco.mealtracker",
       googleServicesFile: process.env.GOOGLE_SERVICES_PLIST || "./GoogleService-Info.plist",
       supportsTablet: false,
+      infoPlist: {
+        ITSAppUsesNonExemptEncryption: false
+      }
     },
     plugins: [
       "expo-router",
