@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, Alert, StyleSheet, TextInput, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
-import { signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential, GoogleAuthProvider } from 'firebase/auth';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { auth } from '../../firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { deleteUserData } from '@/backend/firestore';
@@ -15,6 +16,17 @@ const Settings = () => {
 
     const handleSignOut = async () => {
         try {
+            // Check if the user signed in with Google
+            const isGoogleUser = user?.providerData.some(
+                (provider) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+            );
+
+            if (isGoogleUser) {
+                // Sign out from Google first
+                await GoogleSignin.signOut();
+            }
+
+            // Then sign out from Firebase
             await signOut(auth);
             router.replace('/(auth)/signin');
         } catch (error) {
@@ -41,12 +53,21 @@ const Settings = () => {
 
         setIsDeleting(true);
         try {
-            const isReauthenticated = await reauthenticate(password);
-            if (!isReauthenticated) {
-                Alert.alert('Error', 'Failed to reauthenticate. Please check your password and try again.');
-                return;
+            const isGoogleUser = user?.providerData.some(
+                (provider) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+            );
+
+            // Only reauthenticate if it's an email/password user
+            if (!isGoogleUser) {
+                const isReauthenticated = await reauthenticate(password);
+                if (!isReauthenticated) {
+                    Alert.alert('Error', 'Failed to reauthenticate. Please check your password and try again.');
+                    setIsDeleting(false); // Stop loading indicator
+                    return; // Exit early if reauthentication fails
+                }
             }
 
+            // Proceed with deletion for both Google and reauthenticated email/password users
             // First, delete the user's Firestore data
             await deleteUserData(user.uid);
 
@@ -72,7 +93,18 @@ const Settings = () => {
                 { text: 'Cancel', style: 'cancel' },
                 {
                     text: 'Delete',
-                    onPress: () => setIsModalVisible(true),
+                    onPress: () => {
+                        const isGoogleUser = user?.providerData.some(
+                            (provider) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+                        );
+                        if (isGoogleUser) {
+                            // Skip password modal for Google users
+                            handleDeleteAccount();
+                        } else {
+                            // Show password modal for email/password users
+                            setIsModalVisible(true);
+                        }
+                    },
                     style: 'destructive'
                 },
             ]

@@ -141,7 +141,7 @@ const Home = () => {
           <Text style={styles.dateText}>
             {format(parseISO(date || getCurrentLocalDate()), "MMMM do")}
           </Text>
-          <Pressable onPress={() => router.push('/settings')} style={({ pressed }) => [
+          <Pressable onPress={() => router.push('/(screens)/settings')} style={({ pressed }) => [
             pressed && styles.pressedButton
           ]}
           >
