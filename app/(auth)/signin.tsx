@@ -1,9 +1,10 @@
 import { auth } from '../../firebase';
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, router } from 'expo-router';
-import React from 'react';
-import { StyleSheet, Pressable, Text, TextInput, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Pressable, Text, TextInput, View, Platform } from 'react-native';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 export default function SignIn() {
   const [value, setValue] = React.useState({
@@ -11,9 +12,31 @@ export default function SignIn() {
     password: '',
     error: ''
   });
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isGoogleSignInAvailable, setIsGoogleSignInAvailable] = useState(false);
 
-  // Reset state when component unmounts or user navigates away
+  useEffect(() => {
+    checkPlayServices();
+  }, []);
+
+  const checkPlayServices = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: false });
+        setIsGoogleSignInAvailable(true);
+      } catch (error: any) {
+        if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+          setValue((prevValue) => ({ ...prevValue, error: 'Google Play Services are required for Google Sign-In but are not available on this device.' }));
+        } else {
+          setValue((prevValue) => ({ ...prevValue, error: 'An error occurred checking Google Play Services.' }));
+        }
+        setIsGoogleSignInAvailable(false);
+      }
+    } else {
+      // On iOS, Play Services are not needed, so assume it's available
+      setIsGoogleSignInAvailable(true);
+    }
+  };
   const resetFields = () => {
     setValue({
       email: '',
@@ -61,6 +84,58 @@ export default function SignIn() {
 
       return currentValue;
     });
+  }
+
+  async function signInWithGoogle() {
+    if (!isGoogleSignInAvailable) {
+      setValue((prevValue) => ({ ...prevValue, error: 'Google Sign-In is not available on this device.' }));
+      checkPlayServices(); // Re-check just in case
+      return;
+    }
+
+    try {
+      // Check again right before sign-in attempt
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+      // Get the user info containing the ID token
+      const userInfo = await GoogleSignin.signIn();
+
+      // Ensure idToken is present
+      if (!userInfo || !userInfo.data || !userInfo.data.idToken) {
+        console.error("Google Sign-In Error: ID Token is missing from response. Check webClientId configuration.", userInfo);
+        setValue((prevValue) => ({ ...prevValue, error: 'Failed to retrieve Google ID Token. Ensure the webClientId is correctly configured.' }));
+        return;
+      }
+
+      // Create a Google credential with the token
+      const googleCredential = GoogleAuthProvider.credential(userInfo.data.idToken);
+
+      // Sign-in the user with the credential
+      const userCredential = await signInWithCredential(auth, googleCredential);
+
+      if (userCredential.user) {
+        router.replace('/(screens)/home');
+      } else {
+        router.replace('/(auth)/verify-email');
+      }
+
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // User cancelled the login flow
+        setValue((prevValue) => ({ ...prevValue, error: '' })); // Clear previous errors
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // Operation (e.g. sign in) is in progress already
+        setValue((prevValue) => ({ ...prevValue, error: 'Sign-in is already in progress.' }));
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // Play services not available or outdated
+        setValue((prevValue) => ({ ...prevValue, error: 'Google Play Services is not available or outdated.' }));
+        setIsGoogleSignInAvailable(false);
+      } else {
+        // Some other error happened
+        console.error("Google Sign-In Error:", error);
+        setValue((prevValue) => ({ ...prevValue, error: 'An error occurred during Google Sign-In. Please try again.' }));
+      }
+    }
   }
 
   return (
@@ -135,6 +210,26 @@ export default function SignIn() {
             )}
           </Pressable>
         </Link>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.googleButton,
+            !isGoogleSignInAvailable && styles.disabledButton,
+            pressed && isGoogleSignInAvailable && styles.buttonPressed
+          ]}
+          onPress={signInWithGoogle}
+          disabled={!isGoogleSignInAvailable}
+        >
+          {({ pressed }) => (
+            <Text style={[
+              styles.buttonText,
+              !isGoogleSignInAvailable && styles.disabledButtonText,
+              pressed && isGoogleSignInAvailable && styles.textPressed
+            ]}>
+              {isGoogleSignInAvailable ? 'Log in with Google' : 'Google Sign-In Unavailable'}
+            </Text>
+          )}
+        </Pressable>
       </View>
     </View>
   );
@@ -205,5 +300,18 @@ const styles = StyleSheet.create({
   },
   textPressed: {
     opacity: 0.75,
+  },
+  googleButton: {
+    marginTop: 16,
+    backgroundColor: '#4285F4', // Google Blue
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  disabledButton: {
+    backgroundColor: '#9CA3AF', // Gray color for disabled state
+  },
+  disabledButtonText: {
+    color: '#E5E7EB', // Lighter text color for disabled state
   },
 });
