@@ -11,11 +11,7 @@ jobs:
     params:
       platform: android 
       profile: preview 
-
-  publish_apk_to_github:
-    name: Publish APK to GitHub
-    needs: [create_preview_build] 
-    type: custom
+      
     steps:
       - run: |
           # Install GitHub CLI
