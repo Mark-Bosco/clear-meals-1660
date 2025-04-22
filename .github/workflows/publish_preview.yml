@@ -25,6 +25,7 @@ jobs:
         run: |
           sudo apt update && sudo apt install gh jq wget -y
           npm install -g eas-cli
+          npm install dotenv  # Install dotenv for loading environment variables
 
       - name: 🧪 Debug - Check if EXPO_TOKEN is present
         run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
