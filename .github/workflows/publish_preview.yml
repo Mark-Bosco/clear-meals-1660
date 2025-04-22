@@ -3,7 +3,7 @@ name: Publish preview update with APK release
 on:
   workflow_dispatch:
   push:
-    branches: ['*'] 
+    branches: ['*']
 
 jobs:
   create_preview_build:
@@ -13,7 +13,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
       - name: ⚙️ Set up Node.js (for EAS CLI)
@@ -27,19 +27,7 @@ jobs:
           npm install -g eas-cli
 
       - name: 🧪 Debug - Check if EXPO_TOKEN is present
-        run: |
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "❌ EXPO_TOKEN is not set. Please check your repository secrets."
-            exit 1
-          else
-            echo "✅ EXPO_TOKEN is set."
-          fi
-
-      - name: 🔐 EAS Login
-        run: |
-          echo "Logging into EAS..."
-          export EXPO_TOKEN=${EXPO_TOKEN}
-          eas login 
+        run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
 
       - name: 🚀 Trigger EAS Preview Build
         run: |
