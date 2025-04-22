@@ -35,37 +35,34 @@ jobs:
           echo "Triggering preview build..."
           eas build --platform android --profile preview --non-interactive --no-wait
 
-      - name: ⏳ Wait for build to finish
+      - name: ⏳ Wait for build to complete
         run: |
-          echo "Waiting for preview build to complete..."
-        
-          BUILD_ID=""
+          echo "Waiting for build $BUILD_ID to complete..."
+  
+          MAX_ATTEMPTS=120  # 2 hours
+          ATTEMPTS=0
           STATUS=""
-        
-          while [ "$STATUS" != "finished" ]; do
-            echo "🔍 Checking build status..."
-        
-            RESPONSE=$(eas build:list --platform android --limit 1 --json)
-            BUILD_ID=$(echo "$RESPONSE" | jq -r '.[] | select(.metadata.buildProfile == "preview") | .id')
-            STATUS=$(echo "$RESPONSE" | jq -r '.[] | select(.metadata.buildProfile == "preview") | .status')
-        
-            if [ -z "$BUILD_ID" ]; then
-              echo "❌ Could not find a build ID. Retrying..."
-              sleep 20
-              continue
-            fi
-        
-            echo "🛠 Build ID: $BUILD_ID, Status: $STATUS"
-        
-            if [ "$STATUS" != "finished" ]; then
-              echo "⏳ Still building... sleeping for 30s"
-              sleep 30
+  
+          while [[ "$STATUS" != "finished" && "$STATUS" != "errored" && $ATTEMPTS -lt $MAX_ATTEMPTS ]]; do
+            echo "🔍 Checking build status (attempt $ATTEMPTS)..."
+            STATUS=$(eas build:inspect --json --id $BUILD_ID | jq -r '.status')
+            echo "Current status: $STATUS"
+            if [[ "$STATUS" != "finished" && "$STATUS" != "errored" ]]; then
+              ATTEMPTS=$((ATTEMPTS + 1))
+              sleep 60
             fi
           done
-        
-          echo "✅ Build complete! ID: $BUILD_ID"
-          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
-        
+  
+          if [[ "$STATUS" == "finished" ]]; then
+            echo "✅ Build completed successfully!"
+          elif [[ "$STATUS" == "errored" ]]; then
+            echo "❌ Build failed."
+            exit 1
+          else
+            echo "❌ Build timed out after $MAX_ATTEMPTS attempts."
+            exit 1
+          fi
+      
 
 
       - name: 📦 Download APK
