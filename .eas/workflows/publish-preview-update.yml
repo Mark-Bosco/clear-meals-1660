@@ -1,34 +1,8 @@
-name: Publish preview update with APK release
-
-on:
-  push:
-    branches: ['*'] 
-
+name: Creating preview build for Github Actions
 jobs:
-  create_preview_build:
-    name: Create preview build
+  android_development_build:
+    name: Build Android
     type: build
     params:
-      platform: android 
-      profile: preview 
-
-    steps:
-      - run: |
-          # Install GitHub CLI 
-          sudo apt update && sudo apt install gh -y
-
-          # Authenticate with GitHub
-          echo $GITHUB_TOKEN | gh auth login --with-token
-
-          # Check for APK file
-          APK_PATH=$(find $EAS_BUILD_ARTIFACTS -name "*.apk" -print || true)
-
-          if [ -z "$APK_PATH" ]; then
-              echo "Error: APK file not found in $EAS_BUILD_ARTIFACTS. Release creation aborted."
-              exit 1
-          fi
-
-          # Create GitHub release
-          RELEASE_NAME="Preview Build: $(date +'%Y-%m-%d %H:%M:%S')"
-          RELEASE_TAG="preview-$(date +'%Y%m%d%H%M')"
-          gh release create $RELEASE_TAG $APK_PATH --title "$RELEASE_NAME" --notes "Automated preview build release."
+      platform: android
+      profile: development
