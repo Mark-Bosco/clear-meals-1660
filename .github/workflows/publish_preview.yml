@@ -1,63 +1,63 @@
 name: Publish preview update with APK release
 
 on:
+  workflow_dispatch:
   push:
-    branches: ['*']
+    branches: ['*'] 
 
 jobs:
   create_preview_build:
     runs-on: ubuntu-latest
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
-      - name: ⚙️ Set up Node.js (for eas-cli)
+      - name: ⚙️ Set up Node.js (for EAS CLI)
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: 🛠 Install system dependencies
+      - name: 🛠 Install dependencies
         run: |
-          sudo apt update
-          sudo apt install gh jq wget -y
+          sudo apt update && sudo apt install gh jq wget -y
           npm install -g eas-cli
 
-      - name: 🔐 Authenticate and trigger EAS build (Preview)
-        run: |
-          eas login --token "${EXPO_TOKEN}"
+      - name: 🧪 Debug - Check if EXPO_TOKEN is present
+        run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
 
-          echo "🚀 Triggering preview build..."
+      - name: 🚀 Trigger EAS Preview Build
+        run: |
+          echo "Triggering preview build..."
           eas build --platform android --profile preview --non-interactive --no-wait
 
-      - name: ⏳ Wait for latest preview build to finish
+      - name: ⏳ Wait for build to finish
         run: |
-          echo "🕒 Polling for finished preview build..."
-
+          echo "Waiting for preview build to complete..."
           BUILD_ID=""
           while [ -z "$BUILD_ID" ]; do
             BUILD_ID=$(eas build:list --status finished --platform android --json | jq -r '.[] | select(.metadata.buildProfile == "preview") | .id' | head -n 1)
             if [ -z "$BUILD_ID" ]; then
-              echo "⏳ Waiting for preview build to finish..."
+              echo "⏳ Still building..."
               sleep 30
             fi
           done
-
-          echo "✅ Found finished build ID: $BUILD_ID"
+          echo "✅ Build complete. ID: $BUILD_ID"
           echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
 
-      - name: 📦 Get APK download URL and download
+      - name: 📦 Download APK
         run: |
           APK_URL=$(eas build:list --status finished --platform android --json | jq -r '.[] | select(.metadata.buildProfile == "preview") | .artifacts.buildUrl' | head -n 1)
 
           if [ -z "$APK_URL" ]; then
-            echo "❌ APK URL not found. Aborting."
+            echo "❌ No APK found. Aborting."
             exit 1
           fi
 
-          echo "⬇️ Downloading APK..."
+          echo "⬇️ Downloading APK from: $APK_URL"
           wget -O preview.apk "$APK_URL"
 
           if [ ! -f preview.apk ]; then
@@ -66,8 +66,6 @@ jobs:
           fi
 
       - name: 🚀 Publish GitHub Release with APK
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           RELEASE_TAG="preview-$(date +'%Y%m%d%H%M')"
           RELEASE_NAME="Preview Build - $(date +'%Y-%m-%d %H:%M:%S')"
