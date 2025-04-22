@@ -1,4 +1,4 @@
-name: Publish preview update with APK release
+name: Publish Preview Update with APK Release
 
 on:
   workflow_dispatch:
@@ -30,22 +30,11 @@ jobs:
 
       - name: 🔐 Decode google-services.json
         run: |
-          mkdir -p android/app
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > google-services.json
-          cp google-services.json android/app/google-services.json
-
-      - name: 🧪 Debug - Check if EXPO_TOKEN is present
-        run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
 
       - name: ⚙️ Configure EAS project
         run: |
           eas build:configure --platform android
-
-      - name: 📁 Move google-services.json to android/app
-        run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > google-services.json
-          mkdir -p android/app
-          mv google-services.json android/app
 
       - name: 📦 Build APK Locally with EAS
         run: |
