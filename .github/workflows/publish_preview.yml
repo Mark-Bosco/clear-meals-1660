@@ -29,6 +29,11 @@ jobs:
       - name: 🧪 Debug - Check if EXPO_TOKEN is present
         run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
 
+      - name: 🔐 EAS Login
+        run: |
+          echo "Logging into EAS..."
+          eas login --token "$EXPO_TOKEN"
+
       - name: 🚀 Trigger EAS Preview Build
         run: |
           echo "Triggering preview build..."
