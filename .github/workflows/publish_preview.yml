@@ -7,26 +7,30 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
-      - name: Setup repo
+      - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Setup node
-        uses: actions/setup-node@v4.0.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
           cache: 'npm'
 
-      - name: Set up JDK 17
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
 
-      - name: Setup Android SDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Expo
+      - name: Install Expo & EAS CLI
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
@@ -36,18 +40,32 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Add google-services.json
+      - name: Decode google‑services.json
         run: |
-          mkdir -p android/app
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" \
-            | base64 --decode > android/app/google-services.json
-          ls -l android/app/google-services.json
+            | base64 --decode > google-services.json
+          ls -l google-services.json
 
-      - name: Build Android app
-        run: eas build --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
+      - name: Temporarily un-ignore google‑services.json
+        run: |
+          sed -i 's|^google-services.json|#google-services.json|' .gitignore
+          git diff -- .gitignore
+
+      - name: Build Android APK locally
+        run: |
+          npx eas build \
+            --platform android \
+            --profile preview \
+            --local \
+            --output app-release.apk
+
+      - name: Restore .gitignore
+        run: |
+          sed -i 's|^#google-services.json|google-services.json|' .gitignore
+          git diff -- .gitignore
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: ${{ github.workspace }}/app-release.apk
+          path: app-release.apk
