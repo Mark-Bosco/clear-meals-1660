@@ -1,55 +1,26 @@
-name: Publish preview update with APK release
+name: Build & Publish Release APK
 
 on:
-  workflow_dispatch:
   push:
-    branches: ['*']
+    tags:
+      - '*'
 
 jobs:
-  create_preview_build:
+  Gradle:
     runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v3
-
-      - name: ⚙️ Set up Node.js and EAS CLI
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          
-      - name: 🛠 Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y openjdk-11-jdk wget git curl unzip zip
-          sudo apt install -y gradle
-          npm install -g eas-cli
-          npm install dotenv  # Install dotenv for loading environment variables
-
-      - name: 🧪 Debug - Check if EXPO_TOKEN is present
-        run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
-
-      # Step to build APK locally using eas build
-      - name: 📦 Build APK Locally with EAS
-        run: |
-          echo "Building APK locally using EAS..."
-          eas build --platform android --profile preview --local
-
-      - name: 🚀 Publish GitHub Release with APK
-        run: |
-          APK_PATH="dist/your-app-name.apk"  # Update this path to the APK location
-          if [ ! -f "$APK_PATH" ]; then
-            echo "❌ APK build failed. Aborting."
-            exit 1
-          fi
-
-          RELEASE_TAG="preview-$(date +'%Y%m%d%H%M')"
-          RELEASE_NAME="Preview Build - $(date +'%Y-%m-%d %H:%M:%S')"
-
-          echo "📢 Creating GitHub release: $RELEASE_TAG"
-          gh release create "$RELEASE_TAG" "$APK_PATH" \
-            --title "$RELEASE_NAME" \
-            --notes "Automated preview build release for internal testing."
+    - name: checkout code
+      uses: actions/checkout@v2
+    - name: setup jdk
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Make Gradle executable
+      run: chmod +x ./gradlew
+    - name: Build Release APK
+      run: ./gradlew assembleRelease
+    - name: Releasing using Hub
+      uses: kyze8439690/action-release-releaseapk@master
+      env:
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       APP_FOLDER: app
