@@ -39,15 +39,31 @@ jobs:
         run: |
           echo "Waiting for preview build to complete..."
           BUILD_ID=""
-          while [ -z "$BUILD_ID" ]; do
-            BUILD_ID=$(eas build:list --status finished --platform android --json | jq -r '.[] | select(.metadata.buildProfile == "preview") | .id' | head -n 1)
-            if [ -z "$BUILD_ID" ]; then
-              echo "⏳ Still building..."
-              sleep 30
+
+          for i in {1..40}; do
+            echo "🔍 Checking for finished builds..."
+            RAW_JSON=$(eas build:list --status finished --platform android --json 2>&1)
+            echo "🧾 Raw build:list output:"
+            echo "$RAW_JSON"
+
+            # Try to parse it safely
+            BUILD_ID=$(echo "$RAW_JSON" | jq -r 'try .[] | select(.metadata.buildProfile == "preview") | .id' | head -n 1)
+
+            if [ -n "$BUILD_ID" ]; then
+              echo "✅ Build complete. ID: $BUILD_ID"
+              echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+              break
             fi
+
+            echo "⏳ Still building..."
+            sleep 30
           done
-          echo "✅ Build complete. ID: $BUILD_ID"
-          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+
+          if [ -z "$BUILD_ID" ]; then
+            echo "❌ Timed out waiting for build to finish."
+            exit 1
+          fi
+
 
       - name: 📦 Download APK
         run: |
