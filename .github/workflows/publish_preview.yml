@@ -44,37 +44,6 @@ jobs:
       
           echo "✅ Build triggered with ID: $BUILD_ID"
           echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
-      
-
-      - name: ⏳ Wait for build to complete
-        run: |
-          echo "Waiting for build $BUILD_ID to complete..."
-  
-          MAX_ATTEMPTS=180  # 3 hours
-          ATTEMPTS=0
-          STATUS=""
-  
-          while [[ "$STATUS" != "finished" && "$STATUS" != "errored" && $ATTEMPTS -lt $MAX_ATTEMPTS ]]; do
-            echo "🔍 Checking build status (attempt $ATTEMPTS)..."
-            STATUS=$(eas build:inspect --json --id $BUILD_ID | jq -r '.status')
-            echo "Current status: $STATUS"
-            if [[ "$STATUS" != "finished" && "$STATUS" != "errored" ]]; then
-              ATTEMPTS=$((ATTEMPTS + 1))
-              sleep 60
-            fi
-          done
-  
-          if [[ "$STATUS" == "finished" ]]; then
-            echo "✅ Build completed successfully!"
-          elif [[ "$STATUS" == "errored" ]]; then
-            echo "❌ Build failed."
-            exit 1
-          else
-            echo "❌ Build timed out after $MAX_ATTEMPTS attempts."
-            exit 1
-          fi
-      
-
 
       - name: 📦 Download APK
         run: |
