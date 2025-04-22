@@ -16,58 +16,40 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
-      - name: ⚙️ Set up Node.js (for EAS CLI)
+      - name: ⚙️ Set up Node.js and EAS CLI
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
+          
       - name: 🛠 Install dependencies
         run: |
-          sudo apt update && sudo apt install gh jq wget -y
+          sudo apt update
+          sudo apt install -y openjdk-11-jdk wget git curl unzip zip
+          sudo apt install -y gradle
           npm install -g eas-cli
           npm install dotenv  # Install dotenv for loading environment variables
 
       - name: 🧪 Debug - Check if EXPO_TOKEN is present
         run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
 
-      - name: 🚀 Trigger EAS Preview Build
-        id: eas_build
+      # Step to build APK locally using eas build
+      - name: 📦 Build APK Locally with EAS
         run: |
-          echo "Triggering preview build..."
-          BUILD_JSON=$(eas build --platform android --profile preview --non-interactive --json)
-          BUILD_ID=$(echo $BUILD_JSON | jq -r '.[0].id')
-          
-          if [[ -z "$BUILD_ID" ]]; then
-            echo "❌ Failed to retrieve BUILD_ID"
-            exit 1
-          fi
-      
-          echo "✅ Build triggered with ID: $BUILD_ID"
-          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
-
-      - name: 📦 Download APK
-        run: |
-          APK_URL=$(eas build:list --status finished --platform android --json | jq -r '.[] | select(.metadata.buildProfile == "preview") | .artifacts.buildUrl' | head -n 1)
-
-          if [ -z "$APK_URL" ]; then
-            echo "❌ No APK found. Aborting."
-            exit 1
-          fi
-
-          echo "⬇️ Downloading APK from: $APK_URL"
-          wget -O preview.apk "$APK_URL"
-
-          if [ ! -f preview.apk ]; then
-            echo "❌ APK download failed. Aborting."
-            exit 1
-          fi
+          echo "Building APK locally using EAS..."
+          eas build --platform android --local --non-interactive 
 
       - name: 🚀 Publish GitHub Release with APK
         run: |
+          APK_PATH="dist/your-app-name.apk"  # Update this path to the APK location
+          if [ ! -f "$APK_PATH" ]; then
+            echo "❌ APK build failed. Aborting."
+            exit 1
+          fi
+
           RELEASE_TAG="preview-$(date +'%Y%m%d%H%M')"
           RELEASE_NAME="Preview Build - $(date +'%Y-%m-%d %H:%M:%S')"
 
           echo "📢 Creating GitHub release: $RELEASE_TAG"
-          gh release create "$RELEASE_TAG" preview.apk \
+          gh release create "$RELEASE_TAG" "$APK_PATH" \
             --title "$RELEASE_NAME" \
             --notes "Automated preview build release for internal testing."
