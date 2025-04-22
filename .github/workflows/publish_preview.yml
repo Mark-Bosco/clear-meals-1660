@@ -36,7 +36,7 @@ jobs:
       - name: 📦 Build APK Locally with EAS
         run: |
           echo "Building APK locally using EAS..."
-          eas build --platform android --local --non-interactive 
+          eas build --platform android --profile preview --local
 
       - name: 🚀 Publish GitHub Release with APK
         run: |
