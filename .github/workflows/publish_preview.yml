@@ -41,7 +41,7 @@ jobs:
 
       - name: 🛠 Prebuild for Android (Preview)
         run: |
-          npx eas build --platform android --profile preview --no-install
+          npx eas build --platform android --profile preview 
 
       - name: 📦 Build APK Locally with EAS
         run: |
