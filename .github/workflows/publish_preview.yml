@@ -34,15 +34,18 @@ jobs:
           echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > ./build/google-services.json
           echo "✅ google-services.json written"
           ls -l ./build/google-services.json
-        
 
       - name: ⚙️ Configure EAS project
         run: |
-          eas build:configure --platform android
+          npx eas build:configure --platform android
+
+      - name: 🛠 Prebuild for Android (Preview)
+        run: |
+          npx eas build --platform android --profile preview --no-install
 
       - name: 📦 Build APK Locally with EAS
         run: |
-          eas build --platform android --profile preview --local
+          npx eas build --platform android --profile preview --local
 
       - name: 🚀 Publish GitHub Release with APK
         run: |
