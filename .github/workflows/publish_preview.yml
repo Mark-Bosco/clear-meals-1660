@@ -36,16 +36,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Temporarily un-ignore google‑services.json
+      - name: Setup project path
         run: |
-          sed -i 's|^google-services.json|#google-services.json|' .gitignore
+          echo "Project root: $(pwd)"
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > ./google-services.json
 
-      - name: Build Android APK locally 
-        run : eas build --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
-
-      - name: Restore .gitignore
+      - name: Run local build and inject google-services.json
         run: |
-          sed -i 's|^#google-services.json|google-services.json|' .gitignore
+          # Run eas build just to trigger setup and figure out the temp dir
+          echo "Finding build temp path..."
+          TEMP_PATH=$(mktemp -d)
+          echo "Using temp path: $TEMP_PATH"
+          cp ./google-services.json "$TEMP_PATH/google-services.json"
+
+          # Start the real build with GOOGLE_SERVICES_JSON pointing to the file in the temp path
+          export GOOGLE_SERVICES_JSON="$TEMP_PATH/google-services.json"
+          eas build --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
+
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
