@@ -31,15 +31,26 @@ jobs:
         run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
 
       - name: 🚀 Trigger EAS Preview Build
+        id: eas_build
         run: |
           echo "Triggering preview build..."
-          eas build --platform android --profile preview --non-interactive --no-wait
+          BUILD_JSON=$(eas build --platform android --profile preview --non-interactive --json)
+          BUILD_ID=$(echo $BUILD_JSON | jq -r '.[0].id')
+          
+          if [[ -z "$BUILD_ID" ]]; then
+            echo "❌ Failed to retrieve BUILD_ID"
+            exit 1
+          fi
+      
+          echo "✅ Build triggered with ID: $BUILD_ID"
+          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+      
 
       - name: ⏳ Wait for build to complete
         run: |
           echo "Waiting for build $BUILD_ID to complete..."
   
-          MAX_ATTEMPTS=120  # 2 hours
+          MAX_ATTEMPTS=180  # 3 hours
           ATTEMPTS=0
           STATUS=""
   
