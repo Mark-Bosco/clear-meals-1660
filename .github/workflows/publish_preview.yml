@@ -20,31 +20,33 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          
-      - name: 🛠 Install dependencies
+
+      - name: 🛠 Install dependencies and EAS CLI
         run: |
           sudo apt update
           sudo apt install -y openjdk-11-jdk wget git curl unzip zip
-          sudo apt install -y gradle
           npm install -g eas-cli
-          npm install dotenv  # Install dotenv for loading environment variables
+          npm install dotenv
+
+      - name: 🔐 Decode google-services.json
+        run: |
+          mkdir -p android/app
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
 
       - name: 🧪 Debug - Check if EXPO_TOKEN is present
         run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
 
-      - name: Decode google-services.json
+      - name: ⚙️ Configure EAS project
         run: |
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > google-services.json
+          eas build:configure --platform android
 
-      # Step to build APK locally using eas build
       - name: 📦 Build APK Locally with EAS
         run: |
-          echo "Building APK locally using EAS..."
           eas build --platform android --profile preview --local
 
       - name: 🚀 Publish GitHub Release with APK
         run: |
-          APK_PATH="dist/your-app-name.apk"  # Update this path to the APK location
+          APK_PATH=$(find . -name '*.apk' | head -n 1)
           if [ ! -f "$APK_PATH" ]; then
             echo "❌ APK build failed. Aborting."
             exit 1
