@@ -53,11 +53,7 @@ jobs:
 
       - name: Build Android APK locally
         run: |
-          npx eas build \
-            --platform android \
-            --profile preview \
-            --local \
-            --output app-release.apk
+          run: eas build --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
 
       - name: Restore .gitignore
         run: |
