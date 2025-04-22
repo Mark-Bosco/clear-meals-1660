@@ -27,9 +27,10 @@ jobs:
           npm install -g eas-cli
 
       - name: 🔐 Expo Login via GitHub Action
-        uses: expo/expo-action@v2
+        uses: expo/expo-action@latest
         with:
-          token: ${{ secrets.EXPO_TOKEN }}
+          expo-cli-version: latest
+          expo-token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 🧪 Debug - Check if EXPO_TOKEN is present
         run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
