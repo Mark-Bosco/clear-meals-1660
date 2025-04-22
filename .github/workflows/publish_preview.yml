@@ -39,8 +39,9 @@ jobs:
       - name: Add google-services.json
         run: |
           mkdir -p android/app
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
-          echo "✅ google-services.json written to android/app/"
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" \
+            | base64 --decode > android/app/google-services.json
+          ls -l android/app/google-services.json
 
       - name: Build Android app
         run: eas build --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk

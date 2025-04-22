@@ -21,7 +21,7 @@ module.exports = {
         backgroundColor: "#ffffff"
       },
       package: "com.bosco.mealtracker",
-      googleServicesFile: process.env.GOOGLE_SERVICES_JSON || "./google-services.json" || ".build/google-services.json",
+      googleServicesFile: process.env.GOOGLE_SERVICES_JSON || "./google-services.json" || "./android/app/google-services.json",
     },
     ios: {
       bundleIdentifier: "com.bosco.mealtracker",
