@@ -39,7 +39,6 @@ jobs:
       - name: Temporarily un-ignore google‑services.json
         run: |
           sed -i 's|^google-services.json|#google-services.json|' .gitignore
-          git diff -- .gitignore
 
       - name: Build Android APK locally 
         run : eas build --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
@@ -47,7 +46,6 @@ jobs:
       - name: Restore .gitignore
         run: |
           sed -i 's|^#google-services.json|google-services.json|' .gitignore
-          git diff -- .gitignore
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
