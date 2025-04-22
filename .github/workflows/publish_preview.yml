@@ -30,14 +30,9 @@ jobs:
 
       - name: 🔐 Decode google-services.json
         run: |
-          mkdir -p android/app  # 👈 Ensure the target directory exists
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
-          if [ -f android/app/google-services.json ]; then
-            echo "✅ google-services.json written successfully"
-          else
-            echo "❌ Failed to write google-services.json"
-            exit 1
-          fi
+          mkdir -p android/app
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > google-services.json
+          cp google-services.json android/app/google-services.json
 
       - name: 🧪 Debug - Check if EXPO_TOKEN is present
         run: echo "EXPO_TOKEN is set? => ${EXPO_TOKEN:+yes}"
