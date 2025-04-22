@@ -40,6 +40,11 @@ jobs:
         run: |
           eas build:configure --platform android
 
+      - name: 📁 Move google-services.json to android/app
+        run: |
+           mkdir -p android/app
+           mv google-services.json android/app/google-services.json
+
       - name: 📦 Build APK Locally with EAS
         run: |
           eas build --platform android --profile preview --local
