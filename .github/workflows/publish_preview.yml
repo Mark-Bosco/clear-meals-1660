@@ -35,36 +35,36 @@ jobs:
           echo "Triggering preview build..."
           eas build --platform android --profile preview --non-interactive --no-wait
 
-          - name: ⏳ Wait for build to finish
-          run: |
-            echo "Waiting for preview build to complete..."
+      - name: ⏳ Wait for build to finish
+        run: |
+          echo "Waiting for preview build to complete..."
         
-            BUILD_ID=""
-            STATUS=""
+          BUILD_ID=""
+          STATUS=""
         
-            while [ "$STATUS" != "finished" ]; do
-              echo "🔍 Checking build status..."
+          while [ "$STATUS" != "finished" ]; do
+            echo "🔍 Checking build status..."
         
-              RESPONSE=$(eas build:list --platform android --limit 1 --json)
-              BUILD_ID=$(echo "$RESPONSE" | jq -r '.[] | select(.metadata.buildProfile == "preview") | .id')
-              STATUS=$(echo "$RESPONSE" | jq -r '.[] | select(.metadata.buildProfile == "preview") | .status')
+            RESPONSE=$(eas build:list --platform android --limit 1 --json)
+            BUILD_ID=$(echo "$RESPONSE" | jq -r '.[] | select(.metadata.buildProfile == "preview") | .id')
+            STATUS=$(echo "$RESPONSE" | jq -r '.[] | select(.metadata.buildProfile == "preview") | .status')
         
-              if [ -z "$BUILD_ID" ]; then
-                echo "❌ Could not find a build ID. Retrying..."
-                sleep 20
-                continue
-              fi
+            if [ -z "$BUILD_ID" ]; then
+              echo "❌ Could not find a build ID. Retrying..."
+              sleep 20
+              continue
+            fi
         
-              echo "🛠 Build ID: $BUILD_ID, Status: $STATUS"
+            echo "🛠 Build ID: $BUILD_ID, Status: $STATUS"
         
-              if [ "$STATUS" != "finished" ]; then
-                echo "⏳ Still building... sleeping for 30s"
-                sleep 30
-              fi
-            done
+            if [ "$STATUS" != "finished" ]; then
+              echo "⏳ Still building... sleeping for 30s"
+              sleep 30
+            fi
+          done
         
-            echo "✅ Build complete! ID: $BUILD_ID"
-            echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+          echo "✅ Build complete! ID: $BUILD_ID"
+          echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
         
 
 
