@@ -38,7 +38,8 @@ jobs:
       - name: 🔐 EAS Login
         run: |
           echo "Logging into EAS..."
-          eas login --token "$EXPO_TOKEN"
+          export EXPO_TOKEN=${EXPO_TOKEN}
+          eas login 
 
       - name: 🚀 Trigger EAS Preview Build
         run: |
