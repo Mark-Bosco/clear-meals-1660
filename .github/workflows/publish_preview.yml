@@ -35,34 +35,37 @@ jobs:
           echo "Triggering preview build..."
           eas build --platform android --profile preview --non-interactive --no-wait
 
-      - name: ⏳ Wait for build to finish
-        run: |
-          echo "Waiting for preview build to complete..."
-          BUILD_ID=""
-
-          for i in {1..40}; do
-            echo "🔍 Checking for finished builds..."
-            RAW_JSON=$(eas build:list --status finished --platform android --json 2>&1)
-            echo "🧾 Raw build:list output:"
-            echo "$RAW_JSON"
-
-            # Try to parse it safely
-            BUILD_ID=$(echo "$RAW_JSON" | jq -r 'try .[] | select(.metadata.buildProfile == "preview") | .id' | head -n 1)
-
-            if [ -n "$BUILD_ID" ]; then
-              echo "✅ Build complete. ID: $BUILD_ID"
-              echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
-              break
-            fi
-
-            echo "⏳ Still building..."
-            sleep 30
-          done
-
-          if [ -z "$BUILD_ID" ]; then
-            echo "❌ Timed out waiting for build to finish."
-            exit 1
-          fi
+          - name: ⏳ Wait for build to finish
+          run: |
+            echo "Waiting for preview build to complete..."
+        
+            BUILD_ID=""
+            STATUS=""
+        
+            while [ "$STATUS" != "finished" ]; do
+              echo "🔍 Checking build status..."
+        
+              RESPONSE=$(eas build:list --platform android --limit 1 --json)
+              BUILD_ID=$(echo "$RESPONSE" | jq -r '.[] | select(.metadata.buildProfile == "preview") | .id')
+              STATUS=$(echo "$RESPONSE" | jq -r '.[] | select(.metadata.buildProfile == "preview") | .status')
+        
+              if [ -z "$BUILD_ID" ]; then
+                echo "❌ Could not find a build ID. Retrying..."
+                sleep 20
+                continue
+              fi
+        
+              echo "🛠 Build ID: $BUILD_ID, Status: $STATUS"
+        
+              if [ "$STATUS" != "finished" ]; then
+                echo "⏳ Still building... sleeping for 30s"
+                sleep 30
+              fi
+            done
+        
+            echo "✅ Build complete! ID: $BUILD_ID"
+            echo "BUILD_ID=$BUILD_ID" >> $GITHUB_ENV
+        
 
 
       - name: 📦 Download APK
