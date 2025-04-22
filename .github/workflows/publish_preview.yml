@@ -30,10 +30,9 @@ jobs:
 
       - name: 🔐 Decode google-services.json
         run: |
-          mkdir -p ./build
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > ./google-services.json
-          echo "✅ Decoded google-services.json into ./build"
-          ls -alh ./build
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > google-services.json
+          echo "✅ google-services.json written"
+          ls -l google-services.json
         
 
       - name: ⚙️ Configure EAS project
