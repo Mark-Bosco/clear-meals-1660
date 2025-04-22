@@ -31,7 +31,7 @@ jobs:
       - name: 🔐 Decode google-services.json
         run: |
           mkdir -p ./build
-          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > ./build/google-services.json
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > ./google-services.json
           echo "✅ Decoded google-services.json into ./build"
           ls -alh ./build
         
