@@ -8,7 +8,7 @@
 
 ---
 
-# 🍽️ **Clear Meals: A Comprehensive Mobile Meal Tracker** 😋
+# 🍽️ **Clear Meals: A Comprehensive Mobile Meal Tracker**
 Clear Meals is a robust, user-friendly mobile application designed to help users track their daily food intake, monitor nutritional information, and maintain a healthy lifestyle. Built with React Native and Expo, this app offers a seamless experience for logging meals, searching for foods, and analyzing nutritional data.
 
 ---
@@ -77,6 +77,14 @@ For full API documentation, visit [FatSecret Platform API](https://platform.fats
 - Solid Lines: Internal Communication
 
 --- 
+
+## Team and Responsibilities
+- Mark Bosco - Documentation, Demo, Architecture Diagram, GCP Services (Firebase Authentication, Firestore, Cloud Run)
+- Mason Mcginnis - Deployment Automation
+- Henry Uz - Deployment Automation
+- Siddarth Surana - GCP Services (Artifact Registry)
+- Daniel Evans - GCP Services (Cloud Storage)
+- Sloane McCensky - Authentication Layer
 
 # **🧑‍💻 For Developers Only! 👩‍💻**
 
