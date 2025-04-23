@@ -4,7 +4,7 @@ module.exports = {
   expo: {
     name: "Clear Meals",
     slug: "clear-meals-1660",
-    version: "1.0.1",
+    version: "1.0.2",
     newArchEnabled: true,
     orientation: "portrait",
     icon: "./assets/images/icon.png",
@@ -21,15 +21,19 @@ module.exports = {
         backgroundColor: "#ffffff"
       },
       package: "com.bosco.mealtracker",
-      googleServicesFile: process.env.GOOGLE_SERVICES_JSON || "./google-services.json"
+      googleServicesFile: process.env.GOOGLE_SERVICES_JSON || "./google-services.json" || "./android/app/google-services.json",
     },
     ios: {
       bundleIdentifier: "com.bosco.mealtracker",
       googleServicesFile: process.env.GOOGLE_SERVICES_PLIST || "./GoogleService-Info.plist",
       supportsTablet: false,
+      infoPlist: {
+        ITSAppUsesNonExemptEncryption: false
+      }
     },
     plugins: [
       "expo-router",
+      "@react-native-google-signin/google-signin",
     ],
     experiments: {
       typedRoutes: true

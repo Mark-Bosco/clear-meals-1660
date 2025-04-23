@@ -1,0 +1,81 @@
+name: Android App APK Build
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Expo & EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup project path
+        run: |
+          echo "Project root: $(pwd)"
+          echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > ./google-services.json
+
+      - name: Run local build and inject google-services.json
+        run: |
+          # Run eas build just to trigger setup and figure out the temp dir
+          echo "Finding build temp path..."
+          TEMP_PATH=$(mktemp -d)
+          echo "Using temp path: $TEMP_PATH"
+          cp ./google-services.json "$TEMP_PATH/google-services.json"
+
+          # Start the real build with GOOGLE_SERVICES_JSON pointing to the file in the temp path
+          export GOOGLE_SERVICES_JSON="$TEMP_PATH/google-services.json"
+          eas build --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
+
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: ${{ github.workspace }}/app-release.apk
+
+      - name: Create tag for release
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions"
+
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
+          TAG_NAME="release-$(date +'%Y%m%d-%H%M%S')"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.workspace }}/app-release.apk
+          tag_name: ${{ env.TAG_NAME }}
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
