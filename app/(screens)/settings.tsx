@@ -1,15 +1,93 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, Alert, StyleSheet, TextInput, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Pressable, Alert, StyleSheet, TextInput, Modal, Image, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { signOut, deleteUser, EmailAuthProvider, reauthenticateWithCredential, GoogleAuthProvider } from 'firebase/auth';
+import { auth, db } from '../../firebase';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { auth } from '../../firebase';
+import * as ImagePicker from 'expo-image-picker';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../../contexts/AuthContext';
 import { deleteUserData } from '@/backend/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const Settings = () => {
-    const router = useRouter();
     const { user } = useAuth();
+    const [image, setImage] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+
+    // Fetch profile image if previously uploaded
+    useEffect(() => {
+        const fetchProfileImage = async () => {
+            if (!user) return;
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const data = userDoc.data();
+                if (data?.profilePictureUrl) {
+                    setImage(data.profilePictureUrl);
+                }
+            } catch (error) {
+                // No image found
+            }
+        };
+
+        fetchProfileImage();
+    }, [user]);
+
+    const pickImage = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permissionResult.granted) {
+            Alert.alert("Permission Denied", "We need camera roll permissions to upload a profile picture.");
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.7,
+        });
+
+        if (!result.canceled) {
+            const asset = result.assets[0];
+            if (asset?.uri && user?.uid) {
+                const downloadURL = await uploadProfilePicture(user.uid, asset.uri);
+                await saveProfileImageUrl(user.uid, downloadURL);
+                setImage(downloadURL); //update profile image on change
+            }
+        }
+    };
+    async function saveProfileImageUrl(userId: string, downloadUrl: string): Promise<void> {
+        try {
+          const userRef = doc(db, 'users', userId); // Reference to the user's Firestore document
+      
+          await updateDoc(userRef, {
+            profilePictureUrl: downloadUrl, // Save the URL to Firestore
+          });
+      
+        } catch (error: any) {
+          console.error('Failed to save profile picture URL:', error.message || error);
+        }
+      }
+    async function uploadProfilePicture(userId: string, uri: string): Promise<string> {
+        try {
+            //console.log("user:", user?.uid);
+            const response = await fetch(uri);
+            const blob = await response.blob();
+        
+            const filename = `${userId}_${Date.now()}.jpg`; // unique filename
+            const storage = getStorage();
+            const storageRef = ref(storage, `profile_pictures/${filename}`);
+        
+            await uploadBytes(storageRef, blob);
+            const downloadUrl = await getDownloadURL(storageRef);
+            return downloadUrl;
+          } catch (error: any) {
+            console.error("Upload failed:", JSON.stringify(error, null, 2));
+            throw error;
+          }
+      }
+
+    const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
     const [password, setPassword] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -114,7 +192,21 @@ const Settings = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Settings</Text>
-
+            {user && (
+                <View style={styles.profileContainer}>
+                    {uploading ? (
+                        <ActivityIndicator size="large" />
+                    ) : (
+                        <Image
+                            source={image ? { uri: image } : require('../../assets/images/icon.png')}
+                            style={styles.profileImage}
+                        />
+                    )}
+                    <Pressable onPress={pickImage} style={styles.uploadButton}>
+                        <Text style={styles.buttonText}>Change Profile Picture</Text>
+                    </Pressable>
+                </View>
+            )}
             {user && user.email && (
                 <View style={styles.emailContainer}>
                     <Text style={styles.emailLabel}>Logged in as:</Text>
@@ -200,6 +292,27 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         marginTop: 40,
     },
+    profileContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    profileImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        marginBottom: 10,
+        backgroundColor: '#e5e7eb'
+    },
+    uploadButton: {
+        backgroundColor: '#2563eb',
+        padding: 8,
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+    },
     pressedButton: {
         opacity: .6
     },
@@ -239,11 +352,6 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         backgroundColor: '#6b7280',
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: '500'
     },
     centeredView: {
         flex: 1,
