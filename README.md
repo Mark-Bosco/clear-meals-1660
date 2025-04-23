@@ -14,7 +14,7 @@ Clear Meals is a robust, user-friendly mobile application designed to help users
 ---
 
 ## 🌟 Features
-- **User Authentication**: Secure sign-up, sign-in, and email verification system.
+- **User Authentication**: Secure sign-up, sign-in, using email verification system or google.
 - **Food Search**: Powered by the FatSecret API for an extensive database of food items.
 - **Meal Logging**: Easy-to-use interface for adding foods to different meal types (Breakfast, Lunch, Dinner, Snack).
 - **Nutritional Information**: Detailed nutritional breakdown for each food item and meal.
@@ -33,7 +33,7 @@ Clear Meals is a robust, user-friendly mobile application designed to help users
   - Authentication for user management.
   - Firestore for database storage.
   - Cloud Functions for secure API interactions.
-  - Cloud Storage for...
+  - Cloud Storage for user profile picture storage.
   - Artificat Registry for storing the containerized dev enviornment.
 - **FatSecret API**: Extensive food database and nutritional information.
 - **TypeScript**: For type-safe code and improved developer experience.
@@ -133,7 +133,7 @@ For full API documentation, visit [FatSecret Platform API](https://platform.fats
 2. Make your code changes in `/functions` and commit them to GitHub
 3. Deploy the new or updated functions with: `firebase deploy --only functions`
 
-## Google Authentication
+## 🔒 Google Authentication
 1. Using a Google Authentication method requires additional configuration of the app in Firebase console. Follow the instructions [in the authentication library docs](https://react-native-google-signin.github.io/docs/setting-up/get-config-file) to configure Firebase and Google Authentication for your platform and build method.
 2. Google Authentication only works with a native build locally or on EAS, not Expo Go, for Android, as it requires native libraries.
 
