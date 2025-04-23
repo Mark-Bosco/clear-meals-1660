@@ -4,7 +4,7 @@ module.exports = {
   expo: {
     name: "Clear Meals",
     slug: "clear-meals-1660",
-    version: "1.0.1",
+    version: "1.0.2",
     newArchEnabled: true,
     orientation: "portrait",
     icon: "./assets/images/icon.png",
