@@ -215,7 +215,7 @@ export default function SignIn() {
           style={({ pressed }) => [
             styles.googleButtonContainer,
             !isGoogleSignInAvailable && styles.disabledButton,
-            pressed && isGoogleSignInAvailable && styles.buttonPressed
+            pressed && isGoogleSignInAvailable && styles.googleButtonPressed
           ]}
           onPress={signInWithGoogle}
           disabled={!isGoogleSignInAvailable}
@@ -311,12 +311,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 48,
     borderRadius: 4,
+    alignSelf: 'center',
+    width: '100%',
   },
   googleButtonImage: {
     width: '100%',
     height: 48,
+  },
+  googleButtonPressed: {
+    opacity: 0.8,
+    backgroundColor: 'transparent',
   },
   disabledButton: {
     backgroundColor: '#9CA3AF',
