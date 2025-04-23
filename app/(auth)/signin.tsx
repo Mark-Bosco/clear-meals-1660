@@ -3,7 +3,7 @@ import { signInWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider,
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, router } from 'expo-router';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Pressable, Text, TextInput, View, Platform } from 'react-native';
+import { StyleSheet, Pressable, Text, TextInput, View, Platform, Image } from 'react-native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 
 export default function SignIn() {
@@ -213,20 +213,25 @@ export default function SignIn() {
 
         <Pressable
           style={({ pressed }) => [
-            styles.googleButton,
+            styles.googleButtonContainer,
             !isGoogleSignInAvailable && styles.disabledButton,
             pressed && isGoogleSignInAvailable && styles.buttonPressed
           ]}
           onPress={signInWithGoogle}
           disabled={!isGoogleSignInAvailable}
         >
-          {({ pressed }) => (
+          {isGoogleSignInAvailable ? (
+            <Image 
+              source={require('../../assets/images/google-signin.png')} 
+              style={styles.googleButtonImage}
+              resizeMode="contain"
+            />
+          ) : (
             <Text style={[
               styles.buttonText,
-              !isGoogleSignInAvailable && styles.disabledButtonText,
-              pressed && isGoogleSignInAvailable && styles.textPressed
+              styles.disabledButtonText
             ]}>
-              {isGoogleSignInAvailable ? 'Log in with Google' : 'Google Sign-In Unavailable'}
+              Google Sign-In Unavailable
             </Text>
           )}
         </Pressable>
@@ -301,17 +306,23 @@ const styles = StyleSheet.create({
   textPressed: {
     opacity: 0.75,
   },
-  googleButton: {
+  googleButtonContainer: {
     marginTop: 16,
-    backgroundColor: '#4285F4', // Google Blue
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 48,
     borderRadius: 4,
   },
+  googleButtonImage: {
+    width: '100%',
+    height: 48,
+  },
   disabledButton: {
-    backgroundColor: '#9CA3AF', // Gray color for disabled state
+    backgroundColor: '#9CA3AF',
+    opacity: 0.7,
   },
   disabledButtonText: {
-    color: '#E5E7EB', // Lighter text color for disabled state
+    color: '#E5E7EB',
   },
 });
