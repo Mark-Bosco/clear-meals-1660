@@ -2,10 +2,11 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { Stack } from "expo-router";
 import React, { useEffect } from "react";
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import Constants from 'expo-constants';
 
 export default function RootLayout() {
     useEffect(() => {
-        const clientId = process.env.EXPO_PUBLIC_WEB_CLIENT_ID || '';
+        const clientId = Constants.expoConfig?.extra?.webClientId || '';
         if (!clientId) {
             console.warn("WEB_CLIENT_ID environment variable is not set. Google Sign-In might not work correctly.");
         }

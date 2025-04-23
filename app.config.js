@@ -54,6 +54,7 @@ module.exports = {
       firebaseAppId: process.env.FIREBASE_APP_ID,
       clientSecret: process.env.CLIENT_SECRET,
       clientId: process.env.CLIENT_ID,
+      webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
     }
   }
 };

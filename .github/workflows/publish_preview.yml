@@ -64,6 +64,7 @@ jobs:
           export CONSUMER_SECRET="${{ secrets.CONSUMER_SECRET }}"
           export CLIENT_SECRET="${{ secrets.CLIENT_SECRET }}"
           export CLIENT_ID="${{ secrets.CLIENT_ID }}"
+          export EXPO_PUBLIC_WEB_CLIENT_ID="${{ secrets.EXPO_PUBLIC_WEB_CLIENT_ID }}"
           
           eas build --platform android --profile preview --local --output ${{ github.workspace }}/app-release.apk
       - name: Upload APK artifact
