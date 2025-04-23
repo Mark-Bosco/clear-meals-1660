@@ -59,3 +59,10 @@ jobs:
         with:
           name: app-release
           path: ${{ github.workspace }}/app-release.apk
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.workspace }}/app-release.apk
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
