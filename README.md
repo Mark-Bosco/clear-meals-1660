@@ -11,6 +11,8 @@
 # 🍽️ **Clear Meals: A Comprehensive Mobile Meal Tracker**
 Clear Meals is a robust, user-friendly mobile application designed to help users track their daily food intake, monitor nutritional information, and maintain a healthy lifestyle. Built with React Native and Expo, this app offers a seamless experience for logging meals, searching for foods, and analyzing nutritional data.
 
+Video Demo: [https://youtu.be/OQB6ncvmeXg](https://youtu.be/OQB6ncvmeXg)
+
 ---
 
 ## 🌟 Features
